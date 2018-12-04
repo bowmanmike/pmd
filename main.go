@@ -9,9 +9,6 @@ import (
 )
 
 const (
-	workCycle         = 25
-	shortBreak        = 5
-	longBreak         = 20
 	cyclesBeforeBreak = 4
 )
 
@@ -20,18 +17,24 @@ type cycleInfo struct {
 	Duration int
 }
 
+var (
+	work       = cycleInfo{"Work", 25}
+	shortBreak = cycleInfo{"Short Break", 5}
+	longBreak  = cycleInfo{"Long Break", 20}
+)
+
 func main() {
 	totalCycleCount := 0
 
 	for {
 		for i := 0; i < cyclesBeforeBreak; i++ {
-			runCycle(cycleInfo{"Work", 25})
+			runCycle(work)
 			if i == cyclesBeforeBreak-1 {
 				break
 			}
-			runCycle(cycleInfo{"Short Break", 5})
+			runCycle(shortBreak)
 		}
-		runCycle(cycleInfo{"Long Break", 20})
+		runCycle(longBreak)
 
 		totalCycleCount++
 		log.Printf("%v full cycles completed!\n", totalCycleCount)
@@ -43,7 +46,7 @@ func runCycle(options cycleInfo) {
 	beeep.Alert("PMD", alertText, "")
 	log.Printf(alertText)
 
-	timer := time.NewTimer(time.Duration(options.Duration) * time.Second)
+	timer := time.NewTimer(time.Duration(options.Duration) * time.Minute)
 
 	<-timer.C
 	fmt.Println("     Done!")
