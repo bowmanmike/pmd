@@ -40,7 +40,10 @@ func main() {
 func runCycle(options cycleInfo) {
 	alertText := fmt.Sprintf("Starting %s cycle for %v minutes", options.Label, options.Duration)
 	beeep.Alert("PMD", alertText, "")
+	fmt.Printf(alertText)
+
 	timer := time.NewTimer(time.Duration(options.Duration) * time.Minute)
 
 	<-timer.C
+	fmt.Println("  -  Done!")
 }
