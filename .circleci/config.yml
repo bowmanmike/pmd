@@ -1,0 +1,33 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/CircleCI-Public/pmd
+    environment:
+      TEST_RESULTS: /tmp/test-results
+    steps:
+      - checkout
+      - run: go get -u github.com/jstemmer/go-junit-report
+      - run: mkdir -p $TEST_RESULTS
+      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run:
+          name: Fetch dependencies
+          command: dep ensure
+      - run:
+          name: Enforce use of Go FMT
+          command: "! go fmt ./... 2>&1 | read"
+      - run:
+          name: Run Go Vet
+          command: "! go vet ./... 2>&1 | read"
+      - run:
+          name: Run test suite
+          command: |
+            trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+            go test -v ./... | tee ${TEST_RESULTS}/go-test.out
+      - store_artifacts:
+          path: $TEST_RESULTS
+          destination: tr1
+      - store_test_results:
+          path: $TEST_RESULTS
+
