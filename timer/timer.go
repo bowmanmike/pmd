@@ -1,8 +1,10 @@
 package timer
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/gen2brain/beeep"
@@ -13,13 +15,44 @@ type CycleInfo struct {
 	Duration int
 }
 
+func Run() {
+	for {
+	}
+}
+
 func RunCycle(options CycleInfo) {
 	alertText := fmt.Sprintf("Starting %s cycle for %v minutes", options.Label, options.Duration)
 	beeep.Alert("PMD", alertText, "")
 	log.Printf(alertText)
 
-	timer := time.NewTimer(time.Duration(options.Duration) * time.Minute)
+	input := make(chan string)
 
-	<-timer.C
+	timer := time.NewTimer(time.Duration(options.Duration) * time.Minute)
+	go readInput(input)
+
+	for {
+		text := <-input
+		if text == "p" {
+			fmt.Println(text)
+			timer.Stop()
+			break
+		}
+		if !timer.Stop() {
+			<-timer.C
+		}
+	}
+
 	fmt.Println("     Done!")
+}
+
+func readInput(data chan string) {
+	buf := bufio.NewReader(os.Stdin)
+
+	for {
+		text, err := buf.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+		data <- text
+	}
 }
