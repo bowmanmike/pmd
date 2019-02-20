@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 	"time"
-
-	"github.com/gen2brain/beeep"
 )
 
 type CycleInfo struct {
@@ -22,25 +20,35 @@ func Run() {
 
 func RunCycle(options CycleInfo) {
 	alertText := fmt.Sprintf("Starting %s cycle for %v minutes", options.Label, options.Duration)
-	beeep.Alert("PMD", alertText, "")
+	// beeep.Alert("PMD", alertText, "")
 	log.Printf(alertText)
 
 	input := make(chan string)
+	// output := make(chan string)
 
 	timer := time.NewTimer(time.Duration(options.Duration) * time.Minute)
+
 	go readInput(input)
 
-	for {
-		text := <-input
-		if text == "p" {
-			fmt.Println(text)
+	for elem := range input {
+		fmt.Println(elem)
+		if elem == "pause" {
 			timer.Stop()
 			break
 		}
-		if !timer.Stop() {
-			<-timer.C
-		}
 	}
+
+	// for {
+	// 	text := <-input
+	// 	if text == "p" {
+	// 		fmt.Println(text)
+	// 		timer.Stop()
+	// 		break
+	// 	}
+	// 	if !timer.Stop() {
+	// 		<-timer.C
+	// 	}
+	// }
 
 	fmt.Println("     Done!")
 }
