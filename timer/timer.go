@@ -14,7 +14,8 @@ type CycleInfo struct {
 }
 
 func RunCycle(options CycleInfo) {
-	alertText := fmt.Sprintf("Starting %s cycle for %v minutes", options.Label, options.Duration)
+	finishTime := time.Now().Add(time.Duration(options.Duration) * time.Minute)
+	alertText := fmt.Sprintf("Starting %s cycle for %v minutes. Cycle will finish at %v", options.Label, options.Duration, finishTime.Format("3:04PM"))
 	beeep.Alert("PMD", alertText, "")
 	log.Printf(alertText)
 
